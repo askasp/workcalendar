@@ -31,10 +31,10 @@ const unparsedDate = commandLineInput.StartDate+":00.000Z"
 
 
 // Remove hours outside working hours as they are irrelevant
-const parseStartDate = (unparsedDate, workDayStart:any, workDayStop:any) => {
+const parseStartDate = (unparsedDate, workDayStart:WorkDaySchedule, workDayEnd:WorkDaySchedule) => {
     const startDate = parse(unparsedDate, "dd-MM-yyyy' 'HH:mm:ss.SSSX", new Date())
-    const workStartDateTime = new Date(Date.UTC(startDate.getUTCFullYear(), startDate.getUTCMonth(), startDate.getUTCDate(), commandLineInput.WorkdayStart.Hours, commandLineInput.WorkdayStart.Minutes))
-    const workEndDateTime = new Date(Date.UTC(startDate.getUTCFullYear(), startDate.getUTCMonth(), startDate.getUTCDate(), commandLineInput.WorkdayStop.Hours, commandLineInput.WorkdayStop.Minutes))
+    const workStartDateTime = new Date(Date.UTC(startDate.getUTCFullYear(), startDate.getUTCMonth(), startDate.getUTCDate(), workDayStart.hours, workDayStart.minutes))
+    const workEndDateTime = new Date(Date.UTC(startDate.getUTCFullYear(), startDate.getUTCMonth(), startDate.getUTCDate(), workDayEnd.hours, workDayEnd.minutes))
     if (isAfter(startDate, workEndDateTime)){
         return workEndDateTime
     }
@@ -145,11 +145,11 @@ const removeOverWork = (workDoneDateTimeWithOverwork: Date, overWork: number, wo
 /// -----------------------WORKFLOW ---------------------------------------------------------
 
 // Parsing and validating external input. Validation is ommitted here for brevity
-const startDate = parseStartDate(unparsedDate, commandLineInput.WorkdayStart, commandLineInput.WorkdayStop)
 const workDayStart = parseWorkdaySchedule(commandLineInput.WorkdayStart)
 const workDayEnd = parseWorkdaySchedule(commandLineInput.WorkdayStop)
 const holidays = parseHolidays(commandLineInput.Holidays)
 const recurringHolidays = parseRecurringHolidays(commandLineInput.RecurringHolidays)
+const startDate = parseStartDate(unparsedDate, workDayStart, workDayEnd)
 
 const workDays = Math.abs(commandLineInput.Increment)
 const timeDirection = commandLineInput.Increment >0? TimeDirection.Forward: TimeDirection.Backward
